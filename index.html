@@ -39,7 +39,6 @@
 <body>
   <div class="wrap">
     <header>
-      <img src="" id="flyerImgPreview" class="logo" alt="Card / Flyer (upload below)"/>
       <div>
         <h1>DHRIYA NASTA HOUSE — Booking</h1>
         <div class="muted small">Take orders, accept payment, generate token & send via WhatsApp</div>
@@ -56,11 +55,32 @@
           </div>
         </div>
 
+<script>
+  // Function to format date and time as "YYYY-MM-DD HH:MM:SS"
+  function getCurrentDateTime() {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0'); // Month is 0-based
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+
+  // Set the input value when the page loads
+  document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('bookingTime').value = getCurrentDateTime();
+  });
+</script>
+
+
         <div style="display:flex;gap:10px;margin-bottom:12px">
           <div style="flex:1">
             <label>Customer Name</label>
-            <input id="custName" type="text" placeholder="e.g., Sureshbhai" />
+            <input id="custName" type="text" placeholder=" " />
           </div>
+          </br>
           <div style="width:190px">
             <label>WhatsApp No.</label>
             <input id="custPhone" type="tel" value="+91 " placeholder="Enter number" />
@@ -103,11 +123,6 @@
 
       <!-- RIGHT: Preview / Controls -->
       <div>
-        <div class="card" style="margin-bottom:12px">
-          <label>Flyer Preview</label>
-          <img id="flyerPreview" class="flyer-preview" alt="Flyer preview (upload)" />
-          <div class="muted small" style="margin-top:8px">Upload your uploaded card/flyer to show on token printout and receipts.</div>
-        </div>
 
         <div class="card" style="margin-bottom:12px">
           <label>Quick Settings</label>
