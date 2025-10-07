@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Dhriya Nasta House — Place Order</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app-container">
+<header>
+<h1>Dhriya Nasta House</h1>
+<p class="muted">Place order | Generate token | Send order to owner</p>
+</header>
+
+
+<section class="customer">
+<label>Customer name
+<input id="customerName" placeholder="e.g. Sureshbhai" />
+</label>
+<label>WhatsApp number
+<input id="customerPhone" placeholder="91xxxxxxxxxx" />
+</label>
+<div class="row">
+<button id="saveLocal">Save Order Locally</button>
+<button id="sendWhatsApp">Send via WhatsApp</button>
+</div>
+</section>
+
+
+<section class="menu">
+<h2>Menu</h2>
+<div id="items" class="items"></div>
+</section>
+
+
+<section class="summary">
+<h2>Order Summary</h2>
+<div id="summaryList"></div>
+<div class="row">
+<button id="generateToken">Generate Token</button>
+<button id="clearCart">Clear</button>
+</div>
+<div id="tokenBox" class="token"></div>
+</section>
+
+
+<footer>
+<small>Built with ❤️ — Free setup instructions included</small>
+</footer>
+</div>
+
+
+<script src="script.js"></script>
+</body>
+</html>
