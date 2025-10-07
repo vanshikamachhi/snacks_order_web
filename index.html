@@ -3,54 +3,422 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Dhriya Nasta House — Place Order</title>
-<link rel="stylesheet" href="style.css">
+<title>Snacks Booking — Single File</title>
+<style>
+  :root{--accent:#0b5d9b;--muted:#666;--card:#fff;--surface:#f6f6f8}
+  body{font-family:Inter,system-ui,Segoe UI,Roboto,"Helvetica Neue",Arial;margin:0;background:var(--surface);color:#222}
+  .wrap{max-width:980px;margin:20px auto;padding:18px}
+  header{display:flex;gap:12px;align-items:center;margin-bottom:14px}
+  header img.logo{width:86px;height:86px;object-fit:cover;border-radius:8px;border:2px solid #eee}
+  header h1{font-size:20px;margin:0}
+  .grid{display:grid;grid-template-columns:1fr 420px;gap:18px}
+  .card{background:var(--card);padding:14px;border-radius:10px;box-shadow:0 6px 18px rgba(20,20,40,0.06)}
+  label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+  input[type="text"], input[type="tel"]{width:100%;padding:8px;border-radius:8px;border:1px solid #ddd;font-size:15px}
+  .items-list{display:grid;gap:8px}
+  .item-row{display:flex;gap:8px;align-items:center;padding:8px;border-radius:8px;border:1px solid #f0f0f0}
+  .item-meta{flex:1}
+  .item-meta b{display:block;font-size:15px}
+  .item-meta small{color:var(--muted)}
+  .qty{width:86px}
+  input[type="number"]{padding:6px;border-radius:8px;border:1px solid #ddd;width:100%;font-size:14px}
+  .subtotal{width:110px;text-align:right;font-weight:600}
+  .summary{display:flex;flex-direction:column;gap:8px}
+  .row{display:flex;justify-content:space-between;align-items:center}
+  button{background:var(--accent);color:#fff;padding:10px 12px;border-radius:10px;border:0;cursor:pointer}
+  button.secondary{background:#fff;color:var(--accent);border:1px solid #cfe0f2}
+  .muted{color:var(--muted);font-size:13px}
+  .token-box{margin-top:12px;padding:12px;border-radius:8px;background:#fcfeff;border:1px solid #e4f0fb}
+  .flyer-preview{max-width:100%;height:120px;object-fit:contain;border-radius:6px;border:1px dashed #ddd;padding:6px;background:#fff}
+  .small{font-size:13px}
+  .actions{display:flex;gap:8px;flex-wrap:wrap}
+  .center{display:flex;gap:8px;align-items:center}
+  @media (max-width:920px){.grid{grid-template-columns:1fr;}.wrap{padding:12px}}
+</style>
 </head>
 <body>
-<div class="app-container">
-<header>
-<h1>Dhriya Nasta House</h1>
-<p class="muted">Place order | Generate token | Send order to owner</p>
-</header>
+  <div class="wrap">
+    <header>
+      <img src="" id="flyerImgPreview" class="logo" alt="Card / Flyer (upload below)"/>
+      <div>
+        <h1>DHRIYA NASTA HOUSE — Booking</h1>
+        <div class="muted small">Take orders, accept payment, generate token & send via WhatsApp</div>
+      </div>
+    </header>
 
+    <div class="grid">
+      <!-- LEFT: Booking form -->
+      <div class="card">
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div style="flex:1">
+            <label>Booking User</label>
+            <input id="bookingUser" type="text" value="himanshu" />
+          </div>
+          <div style="width:180px">
+            <label>Booking Time</label>
+            <input id="bookingTime" type="text" readonly />
+          </div>
+        </div>
 
-<section class="customer">
-<label>Customer name
-<input id="customerName" placeholder="e.g. Sureshbhai" />
-</label>
-<label>WhatsApp number
-<input id="customerPhone" placeholder="91xxxxxxxxxx" />
-</label>
-<div class="row">
-<button id="saveLocal">Save Order Locally</button>
-<button id="sendWhatsApp">Send via WhatsApp</button>
-</div>
-</section>
+        <div style="display:flex;gap:10px;margin-bottom:12px">
+          <div style="flex:1">
+            <label>Customer Name</label>
+            <input id="custName" type="text" placeholder="e.g., Sureshbhai" />
+          </div>
+          <div style="width:190px">
+            <label>WhatsApp No.</label>
+            <input id="custPhone" type="tel" placeholder="9714905375" />
+          </div>
+        </div>
 
+        <div style="display:flex;gap:10px;margin-bottom:12px;align-items:end">
+          <div style="flex:1">
+            <label>Upload Card / Flyer (optional)</label>
+            <input id="flyerUpload" type="file" accept="image/*" />
+          </div>
+          <div style="width:140px">
+            <label class="muted small">Token Counter</label>
+            <div style="display:flex;gap:6px;align-items:center">
+              <button title="Reset tokens" id="resetTokens" class="secondary">Reset</button>
+              <div id="tokenCounter" class="muted small" style="padding:6px 10px;background:#f5faff;border-radius:8px"># 0</div>
+            </div>
+          </div>
+        </div>
 
-<section class="menu">
-<h2>Menu</h2>
-<div id="items" class="items"></div>
-</section>
+        <hr style="border:none;border-top:1px dashed #eee;margin:12px 0"/>
 
+        <div>
+          <label>Items</label>
+          <div class="items-list" id="itemsList"></div>
+        </div>
 
-<section class="summary">
-<h2>Order Summary</h2>
-<div id="summaryList"></div>
-<div class="row">
-<button id="generateToken">Generate Token</button>
-<button id="clearCart">Clear</button>
-</div>
-<div id="tokenBox" class="token"></div>
-</section>
+        <div style="margin-top:12px" class="summary">
+          <div class="row small"><div class="muted">Sub Total</div><div id="subtotalView">₹ 0</div></div>
+          <div class="row small"><div class="muted">Tax (0%)</div><div id="taxView">₹ 0</div></div>
+          <div class="row" style="font-size:18px"><div><b>Total</b></div><div id="totalView"><b>₹ 0</b></div></div>
 
+          <div style="margin-top:10px" class="actions">
+            <button id="markPaid">Payment Received</button>
+            <button id="generateToken" class="secondary">Generate Token</button>
+            <button id="newBooking" class="secondary">New Booking</button>
+          </div>
 
-<footer>
-<small>Built with ❤️ — Free setup instructions included</small>
-</footer>
-</div>
+          <div id="paidNote" class="muted small" style="margin-top:8px"></div>
 
+          <div id="tokenArea" class="token-box" style="display:none"></div>
+        </div>
+      </div>
 
-<script src="script.js"></script>
+      <!-- RIGHT: Preview / Controls -->
+      <div>
+        <div class="card" style="margin-bottom:12px">
+          <label>Flyer Preview</label>
+          <img id="flyerPreview" class="flyer-preview" alt="Flyer preview (upload)" />
+          <div class="muted small" style="margin-top:8px">Upload your uploaded card/flyer to show on token printout and receipts.</div>
+        </div>
+
+        <div class="card" style="margin-bottom:12px">
+          <label>Quick Settings</label>
+          <div style="margin-top:8px">
+            <label class="small">Shop Name</label>
+            <input id="shopName" type="text" value="Dhriya Nasta House, Vadodara" />
+          </div>
+          <div style="margin-top:10px">
+            <label class="small">Center / Location</label>
+            <input id="shopLocation" type="text" value="@Laxmipura" />
+          </div>
+        </div>
+
+        <div class="card">
+          <label>Saved Bookings (local)</label>
+          <div id="savedBookings" style="display:grid;gap:8px;margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+
+    <footer style="text-align:center;margin-top:18px;color:var(--muted);font-size:13px">
+      Open this file in a browser. No server required. WhatsApp uses wa.me link for sharing.
+    </footer>
+  </div>
+
+<script>
+/*
+ Single-file booking app
+ - Edit the "items" array below to customize menu/prices
+ - Uses localStorage for simple persistence
+ - WhatsApp share: opens wa.me with encoded message (works on mobile & WhatsApp Web)
+*/
+
+// Items list: name, price (per pack), packSize (string)
+const items = [
+  {id:'Bhakharvadi', title:'Bhakharwadi', price:400, pack:'500 gm'},
+  {id:'Chakri', title:'Chakri', price:250, pack:'500 gm'},
+  {id:'Keda_no_Chevdo', title:'Keda no Chevdo', price:250, pack:'500 gm'},
+  {id:'Keda_ni_wefer', title:'Keda ni wefer', price:250, pack:'500 gm'},
+  {id:'Jada_mathiya', title:'Jada_mathiya', price:160, pack:'500 gm'},
+  {id:'Suvadi', title:'Suvadi', price:250, pack:'500 gm'},
+  {id:'Panjabi_puri', title:'Panjabi_puri', price:250, pack:'500 gm'},
+  {id:'Farsi_Puri', title:'Farsi_Puri', price:250, pack:'500 gm'}
+];
+
+// Helpers
+const $ = id => document.getElementById(id);
+function formatINR(n){ return '₹ ' + n.toFixed(0); }
+
+// Initialize UI
+const itemsList = $('itemsList'), subtotalView = $('subtotalView'), taxView = $('taxView'), totalView = $('totalView');
+const tokenCounter = $('tokenCounter'), bookingTime = $('bookingTime'), flyerPreview = $('flyerPreview'), flyerImgPreview = $('flyerImgPreview');
+const savedBookingsDiv = $('savedBookings');
+
+let quantities = {}; // id -> integer
+
+// load token counter
+let tokenCount = parseInt(localStorage.getItem('tokenCount')||'0',10);
+updateTokenCounter();
+
+function updateTokenCounter(){ tokenCounter.textContent = '# ' + tokenCount; localStorage.setItem('tokenCount', String(tokenCount)); }
+
+// build items UI
+items.forEach(it=>{
+  quantities[it.id] = 0;
+  const row = document.createElement('div'); row.className='item-row';
+  row.innerHTML = `
+    <div class="item-meta">
+      <b>${it.title}</b>
+      <small>${it.pack} — ${formatINR(it.price)} per pack</small>
+    </div>
+    <div style="width:86px">
+      <label class="muted small">Qty</label>
+      <input min="0" step="1" value="0" class="qtyInput" data-id="${it.id}" type="number" />
+    </div>
+    <div class="subtotal small" data-sub="${it.id}">₹ 0</div>
+  `;
+  itemsList.appendChild(row);
+});
+
+// listen qty change
+itemsList.addEventListener('input', e=>{
+  if(!e.target.classList.contains('qtyInput')) return;
+  const id = e.target.dataset.id;
+  let q = parseInt(e.target.value||'0',10); if(isNaN(q)||q<0) q=0;
+  quantities[id]=q;
+  recompute();
+});
+
+// recompute totals
+function recompute(){
+  let subtotal = 0;
+  items.forEach(it=>{
+    const q = quantities[it.id]||0;
+    // careful arithmetic (digit-by-digit): multiply integers then add
+    const line = it.price * q;
+    subtotal += line;
+    const el = document.querySelector(`[data-sub="${it.id}"]`);
+    if(el) el.textContent = formatINR(line);
+  });
+  const tax = 0; // placeholder
+  const total = subtotal + tax;
+  subtotalView.textContent = formatINR(subtotal);
+  taxView.textContent = formatINR(tax);
+  totalView.innerHTML = '<b>' + formatINR(total) + '</b>';
+  return {subtotal, tax, total};
+}
+
+// Payment / Token generation workflow
+let paymentReceived = false;
+
+$('markPaid').addEventListener('click',()=>{
+  const ok = confirm('Confirm: Payment received (cash)?');
+  if(!ok) return;
+  paymentReceived = true;
+  $('paidNote').textContent = 'Payment received: CASH';
+});
+
+$('generateToken').addEventListener('click',()=>{
+  if(!paymentReceived){
+    if(!confirm('Payment not marked received. Continue to generate token?')) return;
+  }
+  const ok = confirm('Are you sure you want to generate the token?');
+  if(!ok) return;
+
+  // increment token
+  tokenCount = tokenCount + 1;
+  updateTokenCounter();
+
+  // create booking summary
+  const time = new Date();
+  bookingTime.value = time.toLocaleString();
+  const custName = $('custName').value.trim() || 'Customer';
+  const custPhone = $('custPhone').value.trim() || '';
+  const shopName = $('shopName').value.trim();
+  const shopLocation = $('shopLocation').value.trim();
+
+  const calc = recompute();
+  const bookedItems = items.filter(it=> (quantities[it.id]||0) > 0 ).map(it=>{
+    const q = quantities[it.id]||0; const line = it.price * q;
+    return {title:it.title, pack:it.pack, price:it.price, qty:q, subtotal:line};
+  });
+
+  const booking = {
+    token: tokenCount,
+    time: time.toISOString(),
+    displayTime: time.toLocaleString(),
+    custName, custPhone, shopName, shopLocation,
+    items: bookedItems, subtotal: calc.subtotal, tax: calc.tax, total: calc.total,
+    flyerDataUrl: flyerPreview.src || ''
+  };
+
+  // save locally
+  const all = JSON.parse(localStorage.getItem('bookings')||'[]');
+  all.unshift(booking);
+  localStorage.setItem('bookings', JSON.stringify(all));
+
+  // render token area and saved bookings
+  renderToken(booking);
+  renderSavedBookings();
+  paymentReceived = false;
+  $('paidNote').textContent = '';
+});
+
+// New booking resets all fields but keeps token counter
+$('newBooking').addEventListener('click', ()=>{
+  if(!confirm('Start new booking? Current quantities will be cleared.')) return;
+  Object.keys(quantities).forEach(k=>quantities[k]=0);
+  document.querySelectorAll('.qtyInput').forEach(inp=>inp.value=0);
+  recompute();
+  $('custName').value='';
+  $('custPhone').value='';
+  $('tokenArea').style.display='none';
+  $('paidNote').textContent='';
+});
+
+// render token area
+function renderToken(b){
+  const box = $('tokenArea');
+  box.style.display='block';
+  const flyerImg = b.flyerDataUrl ? `<img src="${b.flyerDataUrl}" style="max-width:100%;height:90px;object-fit:contain;border-radius:6px;margin-bottom:6px"/>` : '';
+  const itemsHtml = b.items.map(it=>`<div style="display:flex;justify-content:space-between"><div>${it.title} (${it.qty}×${it.pack})</div><div>${formatINR(it.subtotal)}</div></div>`).join('');
+  const html = `
+    <div style="display:flex;justify-content:space-between;align-items:flex-start">
+      <div>
+        <div style="font-weight:700">${b.shopName}</div>
+        <div class="muted small">${b.shopLocation}</div>
+        <div class="muted small">Token No: <b>${b.token}</b></div>
+        <div class="muted small">${b.displayTime}</div>
+      </div>
+      <div style="text-align:right">
+        <div class="muted small">Customer</div>
+        <div><b>${b.custName}</b></div>
+        <div class="muted small">${b.custPhone}</div>
+      </div>
+    </div>
+    <hr style="border:none;border-top:1px dashed #e6eefb;margin:8px 0">
+    ${flyerImg}
+    ${itemsHtml}
+    <hr style="border:none;border-top:1px dashed #e6eefb;margin:8px 0">
+    <div style="display:flex;justify-content:space-between"><div class="muted small">Total</div><div><b>${formatINR(b.total)}</b></div></div>
+    <div style="margin-top:8px;display:flex;gap:8px">
+      <button id="printToken">Print / Save PDF</button>
+      <button id="waSend" class="secondary">Send via WhatsApp</button>
+      <button id="smsSend" class="secondary">Send via SMS (copy)</button>
+    </div>
+  `;
+  box.innerHTML = html;
+
+  // attach events
+  $('printToken').addEventListener('click', ()=> {
+    const w = window.open('','_blank','width=600,height=800');
+    w.document.write('<html><head><title>Token '+b.token+'</title></head><body>' + box.innerHTML + '</body></html>');
+    w.document.close();
+    w.print();
+  });
+
+  $('waSend').addEventListener('click', ()=>{
+    const msgLines = [];
+    msgLines.push(b.shopName);
+    msgLines.push('Token No: ' + b.token);
+    msgLines.push('Name: ' + b.custName);
+    msgLines.push('Booking at: ' + b.displayTime);
+    msgLines.push('');
+    b.items.forEach(it=> msgLines.push(`${it.title} — ${it.qty} x ${it.pack} = ${formatINR(it.subtotal)}`));
+    msgLines.push('');
+    msgLines.push('Total: ' + formatINR(b.total) + ' ' + b.shopLocation);
+    const msg = encodeURIComponent(msgLines.join('\\n'));
+    const phone = b.custPhone.replace(/[^0-9]/g,'');
+    // wa.me requires international format; if user gave locally, it might not work perfectly. We open wa.me without number when empty.
+    let url = '';
+    if(phone.length >= 8) url = 'https://wa.me/' + phone + '?text=' + msg;
+    else url = 'https://wa.me/?text=' + msg;
+    window.open(url,'_blank');
+  });
+
+  $('smsSend').addEventListener('click', ()=>{
+    const txt = `${b.shopName}\\nToken ${b.token}\\nTotal: ${formatINR(b.total)}\\nThank you.`;
+    navigator.clipboard && navigator.clipboard.writeText(txt).then(()=> alert('Message copied to clipboard — paste into SMS app.'));
+  });
+}
+
+// flyer upload preview
+$('flyerUpload').addEventListener('change', e=>{
+  const f = e.target.files && e.target.files[0];
+  if(!f) return;
+  const reader = new FileReader();
+  reader.onload = function(ev){
+    flyerPreview.src = ev.target.result;
+    flyerImgPreview.src = ev.target.result;
+  }
+  reader.readAsDataURL(f);
+});
+
+// reset tokens
+$('resetTokens').addEventListener('click', ()=>{
+  if(!confirm('Reset token counter to 0?')) return;
+  tokenCount = 0;
+  updateTokenCounter();
+});
+
+// saved bookings render
+function renderSavedBookings(){
+  const all = JSON.parse(localStorage.getItem('bookings')||'[]');
+  savedBookingsDiv.innerHTML = '';
+  if(all.length===0){
+    savedBookingsDiv.innerHTML = '<div class="muted small">No saved bookings</div>';
+    return;
+  }
+  all.slice(0,6).forEach(b=>{
+    const el = document.createElement('div'); el.className='card';
+    el.style.padding='8px'; el.style.marginBottom='6px';
+    el.innerHTML = `<div style="display:flex;justify-content:space-between"><div><b>Token ${b.token}</b> — ${b.custName}</div><div>${formatINR(b.total)}</div></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <button class="viewBtn smallBtn">View</button>
+        <button class="resendBtn secondary smallBtn">WhatsApp</button>
+      </div>
+    `;
+    el.querySelector('.viewBtn').addEventListener('click', ()=> renderToken(b));
+    el.querySelector('.resendBtn').addEventListener('click', ()=>{
+      // reuse send flow (open wa.me)
+      const msgLines = [];
+      msgLines.push(b.shopName);
+      msgLines.push('Token No: ' + b.token);
+      b.items.forEach(it=> msgLines.push(`${it.title} — ${it.qty} x ${it.pack} = ${formatINR(it.subtotal)}`));
+      msgLines.push('Total: ' + formatINR(b.total));
+      const msg = encodeURIComponent(msgLines.join('\\n'));
+      const phone = b.custPhone.replace(/[^0-9]/g,'');
+      let url = '';
+      if(phone.length >= 8) url = 'https://wa.me/' + phone + '?text=' + msg;
+      else url = 'https://wa.me/?text=' + msg;
+      window.open(url,'_blank');
+    });
+    savedBookingsDiv.appendChild(el);
+  });
+}
+
+// initial state
+(function init(){
+  recompute();
+  renderSavedBookings();
+  bookingTime.value = new Date().toLocaleString();
+})();
+</script>
 </body>
 </html>
